@@ -1,0 +1,2 @@
+This line contains no JSON and will be deleted by the --delete other-lines option.
+On the other hand {"json": ["is", "formatted"]} and text surrounding it is preserved (but can also be removed if desired).
