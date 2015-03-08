@@ -6,7 +6,7 @@ from jsonfinder import *
 class BasicTests(unittest.TestCase):
 
     def setUp(self):
-        with open('testin.txt') as infile:
+        with open('tests/testin.txt') as infile:
             self.string = infile.read()
 
     def test_finder(self):
@@ -17,7 +17,7 @@ class BasicTests(unittest.TestCase):
             else:
                 result.append(self.string[start:end])
 
-        with open('testout.txt') as outfile:
+        with open('tests/testout.txt') as outfile:
             self.assertEquals("\n".join(result), outfile.read())
 
     def test_has_json(self):

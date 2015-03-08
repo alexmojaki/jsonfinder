@@ -51,3 +51,8 @@ It's like a more flexible version of python's built in ``json.tool``, a ``grep -
     {"json":["is","formatted"]}
 
 See the ``--help`` option in the command-line for more details.
+
+Installation is as simple as::
+
+    pip install jsonfinder
+

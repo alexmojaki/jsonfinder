@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 from itertools import imap
 import sys
 from json import dumps
