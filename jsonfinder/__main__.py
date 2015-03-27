@@ -3,13 +3,13 @@
 from itertools import imap
 import sys
 from json import dumps
-from jsonfinder import jsonfinder
+from __init__ import jsonfinder, check_min_elements
 from optparse import OptionParser
 
 
 def parse_args(args=None, raise_option_exceptions=False):
 
-    parser = OptionParser(usage="Usage: python -m jsonfinder [OPTIONS] [FILTERS]",
+    parser = OptionParser(usage="Usage: [python -m] jsonfinder [OPTIONS] [FILTERS]",
                           description="Detect JSON in the input and format it or filter based on its presence. "
                                       "Optionally specify space-separated filters so that the program will only pay "
                                       "attention to JSON where the source contains all the filters as substrings.")
@@ -50,6 +50,11 @@ def parse_args(args=None, raise_option_exceptions=False):
                            "input is large and you need a live stream of results then set this flag. However JSON "
                            "that is split across multiple lines will not be detected, meaning that FORMAT=mini/tiny "
                            "will probably not do what you want.")
+
+    parser.add_option("-m", "--min-size", type="int", default=2, metavar="MIN",
+                      help="Only pay attention to (in a similar manner to the filters) objects/arrays with at least "
+                           "MIN elements. This prevents things like [1] from being recognised, which you probably "
+                           "don't want. Default is 2.")
 
     options, args = parser.parse_args(args)
 
@@ -93,7 +98,8 @@ def process_files(infile, outfile, options, filters):
         current_start = 0
         current_end = None
         for start, end, json in jsonfinder(string):
-            if json is not None and all(imap(string[start:end].__contains__, filters)):
+            if (json is not None and all(imap(string[start:end].__contains__, filters)) and
+                    check_min_elements(json, options.min_size)):
                 yield current_start, current_end, None
                 yield start, end, json
                 current_start = end
@@ -181,6 +187,14 @@ def process_args(options, filters):
 
 
 def main():
+    # Ignore SIG_PIPE and don't throw exceptions on it...
+    # (http://docs.python.org/library/signal.html)
+    from signal import signal, SIGPIPE, SIG_DFL
+    try:
+        signal(SIGPIPE, SIG_DFL)
+    except ValueError:
+        pass
+
     process_args(*parse_args())
 
 

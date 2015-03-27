@@ -135,3 +135,31 @@ def only_json(s, decoder=None):
     if result is None:
         raise ValueError("No JSON object found in argument.")
     return result
+
+
+def check_min_elements(obj, num):
+    """
+    Returns a boolean indicating if ``obj`` has at least ``num`` elements at its leaves when viewed as a tree.
+    That is, it iterates recursively over lists and dicts, checking that the ``obj`` has at least ``num`` primitive
+    values at the lowest levels. dict keys are not counted.
+    :type num: int
+    :return: bool
+    """
+    return __check_min_elements_helper(obj, num, 0) >= num
+
+
+def __check_min_elements_helper(obj, num, count):
+    values = ()
+    if isinstance(obj, list):
+        values = obj
+    elif isinstance(obj, dict):
+        values = obj.itervalues()
+    else:
+        count += 1
+
+    for val in values:
+        count = __check_min_elements_helper(val, num, count)
+        if count >= num:
+            break
+
+    return count
