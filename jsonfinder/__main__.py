@@ -56,6 +56,10 @@ def parse_args(args=None, raise_option_exceptions=False):
                            "MIN elements. This prevents things like [1] from being recognised, which you probably "
                            "don't want. Default is 2.")
 
+    parser.add_option("-a", "--array", action="store_true",
+                      help="Delete context and other lines and output a JSON array of the selected "
+                           "JSON objects/arrays. Currently the -l/--linewise flag has no effect when this is set.")
+
     options, args = parser.parse_args(args)
 
     try:
@@ -94,18 +98,16 @@ def process_files(infile, outfile, options, filters):
     incl_context = "context" not in options.delete
     incl_json = "json" not in options.delete
 
-    def filtered_jsonfinder(string):
-        current_start = 0
-        current_end = None
-        for start, end, json in jsonfinder(string):
-            if (json is not None and all(imap(string[start:end].__contains__, filters)) and
-                    check_min_elements(json, options.min_size)):
-                yield current_start, current_end, None
-                yield start, end, json
-                current_start = end
-            else:
-                current_end = end
-        yield current_start, current_end, None
+    if options.format != "off":
+        format_json = lambda json: dumps(json, sort_keys=True,
+                                         **{"on": dict(separators=(",", ": "), indent=options.indent),
+                                            "mini": dict(),
+                                            "tiny": dict(separators=(",", ":"))}[options.format])
+
+    def filtered_jsonfinder(string, json_only=False):
+        predicate = lambda start, end, json: (all(imap(string[start:end].__contains__, filters)) and
+                                              check_min_elements(json, options.min_size))
+        return jsonfinder(string, json_only=json_only, predicate=predicate)
 
     def process_string(string):
         for start, end, json in filtered_jsonfinder(string):
@@ -133,16 +135,34 @@ def process_files(infile, outfile, options, filters):
             else:
                 if not incl_json:
                     section = ""
-                elif options.format == "on":
-                    section = dumps(json, sort_keys=True, separators=(",", ": "), indent=options.indent)
-                elif options.format == "mini":
-                    section = dumps(json, sort_keys=True)
-                elif options.format == "tiny":
-                    section = dumps(json, sort_keys=True, separators=(",", ":"))
+                elif options.format != "off":
+                    section = format_json(json)
 
             yield section
 
-    if options.linewise:
+    def make_array_linewise():
+        """
+        This was an attempt to allow combining the array and linewise options, but it was proving too difficult and
+        was given up on.
+        """
+        outfile.write("[" + (options.format == "on") * "\n")
+        found_json = False
+        for line in infile:
+            for start, end, json in filtered_jsonfinder(line, json_only=True):
+                found_json = True
+                if options.format == "off":
+                    json = line[start:end]
+                else:
+                    json = format_json(json)
+                if options.format == "on":
+                    json = "\n".join([options.indent * " " + json_line for json_line in json.splitlines()])
+                outfile.write(found_json * "," + options.format != "tiny" * " " + json)
+                if options.format == "on":
+                    outfile.write("\n")
+            if options.format == "off" and found_json:
+                outfile.write("\n")
+
+    def format_json_linewise():
         for line in infile:
             newline = line and line[-1] == "\n"
             if newline:
@@ -151,13 +171,39 @@ def process_files(infile, outfile, options, filters):
             outfile.write(result)
             if newline and result:
                 outfile.write("\n")
-    else:
-        infile_contents = infile.read()
+
+    def format_json_all():
         part = None
         for part in process_string(infile_contents):
             outfile.write(part)
         if part and part[-1] != "\n" and infile_contents[-1] == "\n":
             outfile.write("\n")
+
+    def make_array_all():
+        array = []
+        for start, end, json in filtered_jsonfinder(infile_contents, json_only=True):
+            if options.format == "off":
+                array.append(infile_contents[start:end])
+            else:
+                array.append(json)
+
+        if options.format == "off":
+            outfile.write("[" + ", ".join(array) + "]")
+        else:
+            outfile.write(format_json(array))
+        outfile.write("\n")
+
+    if options.linewise:
+        if options.array and False:  # this combination is not currently supported
+            make_array_linewise()
+        else:
+            format_json_linewise()
+    else:
+        infile_contents = infile.read()
+        if options.array:
+            make_array_all()
+        else:
+            format_json_all()
 
     outfile.flush()
 

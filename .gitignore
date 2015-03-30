@@ -4,5 +4,4 @@
 /build/
 *.html
 sandbox.py
-.idea/*
 .idea
