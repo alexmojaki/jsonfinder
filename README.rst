@@ -40,14 +40,14 @@ It's like a more flexible version of python's built in ``json.tool``, a ``grep -
     $ cat cli_example.txt
     This line contains no JSON and will be deleted by the --delete other-lines option.
     On the other hand {"json":   ["is", "formatted"]  } and text surrounding it is preserved (but can also be removed if desired).
-    $ python -m jsonfinder -i cli_example.txt --delete other-lines
+    $ jsonfinder -i cli_example.txt --delete other-lines
     On the other hand {
         "json": [
             "is",
             "formatted"
         ]
     } and text surrounding it is preserved (but can also be removed if desired).
-    $ python -m jsonfinder -i cli_example.txt --delete other-lines | python -m jsonfinder --delete context --format tiny
+    $ jsonfinder -i cli_example.txt --delete other-lines | jsonfinder --delete context --format tiny
     {"json":["is","formatted"]}
 
 See the ``--help`` option in the command-line for more details.
