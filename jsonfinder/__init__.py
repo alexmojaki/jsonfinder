@@ -186,7 +186,10 @@ def __check_min_elements_helper(obj, num, count):
     if isinstance(obj, list):
         values = obj
     elif isinstance(obj, dict):
-        values = obj.itervalues()
+        try:
+            values = obj.itervalues()
+        except:
+            values = obj.values()
     else:
         count += 1
 
