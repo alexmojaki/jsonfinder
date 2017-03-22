@@ -1,3 +1,4 @@
+from __future__ import print_function
 from json import JSONDecoder
 
 __decoder = JSONDecoder()
@@ -14,18 +15,19 @@ def jsonfinder(s, decoder=None, json_only=False, predicate=lambda s, e, o: True)
 
         >>> s = 'true [1,2,3] null'
         >>> for start, end, obj in jsonfinder(s):
-        ...     print start, ':', end
+        ...     print(start, ':', end)
         ...     if obj is None:
-        ...         print 'String:', repr(s[start:end])
+        ...         print('String:', repr(s[start:end]))
         ...     else:
-        ...         print 'List of length', len(obj)
+        ...         print('List of length', len(obj))
         0 : 5
         String: 'true '
         5 : 12
         List of length 3
         12 : 17
         String: ' null'
-        >>> assert len(s) == end
+        >>> len(s)  # equal to the last value of end
+        17
 
     Note that JSON primitives are ignored if not contained within an object or array.
 
@@ -134,8 +136,7 @@ def only_json(s, decoder=None):
     Return a single ``(start, end, obj)`` tuple corresponding to a parsed JSON object/array
     if the string s contains exactly one, else raise an exception, e.g.::
 
-        >>> only_json('stuff {"key": "value"} things')[2]
-        {u'key': u'value'}
+        >>> assert only_json('stuff {"key": "value"} things')[2] == {'key': 'value'}
         >>> only_json('stuff only')
         Traceback (most recent call last):
         ...

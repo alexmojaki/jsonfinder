@@ -13,7 +13,7 @@ class BasicTests(unittest.TestCase):
         result = []
         for start, end, obj in jsonfinder(self.string):
             if obj is not None:
-                result.append(json.dumps(obj, indent=2, sort_keys=True))
+                result.append(json.dumps(obj, sort_keys=True))
             else:
                 result.append(self.string[start:end])
 

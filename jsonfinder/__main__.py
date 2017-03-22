@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+from __future__ import print_function
 
 try:
     import itertools.imap as map
@@ -218,7 +219,7 @@ def process_args(options, filters):
             try:
                 return open(opt, mode)
             except IOError as err:
-                print >> sys.stderr, "IOError:", err
+                print("IOError:", err, file=sys.stderr)
                 sys.exit(1)
         else:
             return default
