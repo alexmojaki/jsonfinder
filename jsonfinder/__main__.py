@@ -6,7 +6,7 @@ except ImportError:
     pass
 import sys
 from json import dumps
-from __init__ import jsonfinder, check_min_elements
+from . import jsonfinder, check_min_elements
 from optparse import OptionParser
 
 
