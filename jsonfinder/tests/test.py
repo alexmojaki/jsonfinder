@@ -51,7 +51,7 @@ class BasicTests(unittest.TestCase):
     def test_min_elemets(self):
         obj = {"a": [1, 2], "b": [3, [4, {"c": 5, "d": [6, 7, [8], {"e": 9}]}, 10]]}
         size = 10
-        for test_size in xrange(size*2):
+        for test_size in range(size*2):
             self.assertEquals(check_min_elements(obj, test_size), test_size <= size)
 
 
