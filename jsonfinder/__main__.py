@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 
-from itertools import imap
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
 import sys
 from json import dumps
 from __init__ import jsonfinder, check_min_elements
@@ -105,7 +108,7 @@ def process_files(infile, outfile, options, filters):
                                             "tiny": dict(separators=(",", ":"))}[options.format])
 
     def filtered_jsonfinder(string, json_only=False):
-        predicate = lambda start, end, json: (all(imap(string[start:end].__contains__, filters)) and
+        predicate = lambda start, end, json: (all(map(string[start:end].__contains__, filters)) and
                                               check_min_elements(json, options.min_size))
         return jsonfinder(string, json_only=json_only, predicate=predicate)
 
