@@ -13,7 +13,7 @@ class BasicTests(unittest.TestCase):
         result = []
         for start, end, obj in jsonfinder(self.string):
             if obj is not None:
-                result.append(json.dumps(obj, indent=2, sort_keys=True))
+                result.append(json.dumps(obj, sort_keys=True))
             else:
                 result.append(self.string[start:end])
 
@@ -51,7 +51,7 @@ class BasicTests(unittest.TestCase):
     def test_min_elemets(self):
         obj = {"a": [1, 2], "b": [3, [4, {"c": 5, "d": [6, 7, [8], {"e": 9}]}, 10]]}
         size = 10
-        for test_size in xrange(size*2):
+        for test_size in range(size*2):
             self.assertEquals(check_min_elements(obj, test_size), test_size <= size)
 
 

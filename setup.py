@@ -11,11 +11,12 @@ def readme():
 
 
 setup(name='jsonfinder',
-      version='0.4.1',
+      version='0.4.2',
       description=description,
       long_description=readme(),
       classifiers=[
-          "Programming Language :: Python :: 2 :: Only",
+          "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 3",
           "Topic :: Utilities"
       ],
       url="https://github.com/alexmojaki/jsonfinder",

@@ -1,9 +1,13 @@
 #! /usr/bin/env python
+from __future__ import print_function
 
-from itertools import imap
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
 import sys
 from json import dumps
-from __init__ import jsonfinder, check_min_elements
+from . import jsonfinder, check_min_elements
 from optparse import OptionParser
 
 
@@ -105,7 +109,7 @@ def process_files(infile, outfile, options, filters):
                                             "tiny": dict(separators=(",", ":"))}[options.format])
 
     def filtered_jsonfinder(string, json_only=False):
-        predicate = lambda start, end, json: (all(imap(string[start:end].__contains__, filters)) and
+        predicate = lambda start, end, json: (all(map(string[start:end].__contains__, filters)) and
                                               check_min_elements(json, options.min_size))
         return jsonfinder(string, json_only=json_only, predicate=predicate)
 
@@ -215,7 +219,7 @@ def process_args(options, filters):
             try:
                 return open(opt, mode)
             except IOError as err:
-                print >> sys.stderr, "IOError:", err
+                print("IOError:", err, file=sys.stderr)
                 sys.exit(1)
         else:
             return default
